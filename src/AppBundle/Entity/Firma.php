@@ -2,7 +2,9 @@
 namespace AppBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
  * Firma
@@ -40,7 +42,9 @@ class Firma
     private $description;
 
     /**
-     * @var integer
+     * @ORM\Id
+     * @ORM\Column(type="integer")
+     * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
 
@@ -48,6 +52,11 @@ class Firma
      * @var \Doctrine\Common\Collections\Collection
      */
     private $ansprechpartner;
+    
+    /**
+     * @var \Doctrine\Common\Collections\Collection
+     */
+    private $information;
 
     /**
      * Constructor
@@ -55,6 +64,7 @@ class Firma
     public function __construct()
     {
         $this->ansprechpartner = new ArrayCollection();
+        $this->information = new ArrayCollection();
     }
 
     /**
@@ -236,5 +246,38 @@ class Firma
     public function getAnsprechpartner()
     {
         return $this->ansprechpartner;
+    }
+    
+    /**
+     * Add information
+     *
+     * @param \Information $information
+     * @return Firma
+     */
+    public function addInformation(\AppBundle\Entity\Information $information)
+    {
+        $this->information[] = $information;
+        
+        return $this;
+    }
+
+    /**
+     * Remove information
+     *
+     * @param \Information $information
+     */
+    public function removeInformation(\AppBundle\Entity\Information $information)
+    {
+        $this->information->removeElement($information);
+    }
+
+    /**
+     * Get information
+     *
+     * @return \Doctrine\Common\Collections\Collection 
+     */
+    public function getInformation()
+    {
+        return $this->information;
     }
 }

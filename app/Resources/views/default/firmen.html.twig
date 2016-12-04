@@ -7,14 +7,14 @@ Firmen
 <table class="table">
     <thead>
         <tr>
-            <th>
+            <th width="40%">
             Adresse    
             </th>
-            <th>
-            Kurzbeschreibung
-            </th>
-            <th>
+            <th width="20%">
             Ansprechpartner
+            </th>
+            <th width="40%">
+            Informationen
             </th>
         </tr>
     </thead>
@@ -24,21 +24,52 @@ Firmen
         <td>
             <a href="http://{{ firma.website | raw}}">{{ firma.website }}</a>
             <address>
+            {% if is_granted('ROLE_STAFF') %}
             <strong>
                 <a href="{{ path('editfirma', {'id': firma.id}) }}">{{ firma.name }}</a>
             </strong><br>
+            {% else %}
+            <strong>
+                {{ firma.name }}
+            </strong><br>
+            {% endif %}
             {{ firma.street }}<br>
-            {{ firma.postcode }} {{ firma.city }}
-            </address>
-        </td>
-        <td>
+            {{ firma.postcode }} {{ firma.city }}<br>
             {{ firma.description }}
+            </address>
         </td>
         <td>
             <ul>
             {% for person in firma.ansprechpartner %}
-                <li>{{ person.prename }} {{ person.surname }}</li>
+                {% if is_granted('ROLE_STAFF') %}
+                    <li><a href="{{ path('editcontact', {'id': person.id }) }}">{{ person.prename }} {{ person.surname }}</a></li>
+                {% else %}
+                    <li><strong>{{ person.prename }} {{ person.surname }}</strong><br>
+                {% endif %}
+                    {{ person.position }}<br>
+                {% if person.phone is not empty %}
+                    Tel. {{ person.phone }}<br>
+                {% endif %}
+                    {{ person.email }}</li>
             {% endfor %}
+            {% if is_granted('ROLE_USER') %}
+            <li><a href="{{ path('formcontact', {'id': firma.id}) }}">Neu Hinzufügen</a></li>
+            {% endif %}
+            </ul>
+        </td>
+        <td>
+            <ul>
+            {% for information in firma.information %}
+                {% if is_granted('ROLE_STAFF') %}
+                    <li><a href="{{ path('editinformation', {'id': information.id }) }}">{{ information.infotitle }}</a> vom {{ information.datum|date('d.m.Y') }}</li>
+                {% else %}
+                    <li><strong>{{ information.infotitle }}</strong> vom {{ information.datum|date('d.m.Y') }}<br>
+                {% endif %}
+                {{ information.content }}</li>
+            {% endfor %}
+            {% if is_granted('ROLE_USER') %}
+            <li><a href="{{ path('forminformation', {'id': firma.id}) }}">Neu Hinzufügen</a></li>
+            {% endif %}
             </ul>
         </td>
     </tr>

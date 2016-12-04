@@ -24,7 +24,9 @@ class Praktikum
     private $beruf;
 
     /**
-     * @var integer
+     * @ORM\Id
+     * @ORM\Column(type="integer")
+     * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
 
@@ -38,7 +40,12 @@ class Praktikum
      */
     private $firma;
 
-
+    public function __construct()
+    {
+        $this->startdatum = new \DateTime();
+        $this->enddatum = new \DateTime();
+    }
+    
     /**
      * Set startdatum
      *

@@ -1,0 +1,63 @@
+{% extends 'base.html.twig' %}
+{% block header %}
+Firmeninformation eintragen
+{% endblock %}
+{% block body %}
+    {% if information is defined %}
+        <h2>Information für {{ information.firma.name }} bearbeiten</h2>
+    {% else %}
+        <h2>Information für {{ firma.name }} eintragen</h2>
+    {% endif %}
+    {{ form_start(form) }}
+    <fieldset>
+        <legend>Bitte die Informationen eingeben</legend>
+        <table>
+            <tr>
+                <td>{{ form_label(form.infotype, 'Art der Information') }}</td>
+                <td>{{ form_widget(form.infotype) }}</td>
+                <td>{{ form_errors(form.infotype) }}</td>
+            </tr>
+            {% if is_granted('ROLE_STAFF') and information is defined %}
+            <tr>
+                <td>{{ form_label(form.datum, 'Datum') }}</td>
+                <td>{{ form_widget(form.datum) }}</td>
+                <td>{{ form_errors(form.datum) }}</td>
+            </tr>
+            {% else %}
+                {# field has to set as rendered otherwise it will be displayed at the end #}
+                {% do form.datum.setRendered %}
+            {% endif %}
+            <tr>
+                <td>{{ form_label(form.infotitle, 'Titel') }}</td>
+                <td>{{ form_widget(form.infotitle) }}</td>
+                <td>{{ form_errors(form.infotitle) }}</td>
+            </tr>
+            <tr>
+                <td>{{ form_label(form.content, 'Inhalt') }}</td>
+                <td>{{ form_widget(form.content) }}</td>
+                <td>{{ form_errors(form.content) }}</td> 
+            </tr>
+        </table>
+    <p>
+        <input type="submit" value="erstellen" class="btn btn-default">
+    </p>
+    </fieldset>
+    {%if information is defined and is_granted('ROLE_ADMIN')%}
+<div class="row">
+    <div class="col-md-4">
+        <div class="panel panel-danger">
+            <div class="panel-heading">
+                <h3 class="panel-title">Achtung</h3>
+            </div>
+            <div class="panel-body">
+                <input type="submit" name="delete" id="delete" value="löschen" class="btn btn-warning">
+            </div>
+        </div>
+    </div>
+</div>
+    {%endif%}
+    {{ form_errors(form) }}
+    {{ form_end(form) }}
+    
+    <br>Zurück zur <a href="{{ path('homepage') }}">Hauptseite</a>
+{% endblock %}

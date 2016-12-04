@@ -1,7 +1,7 @@
 {% extends 'base.html.twig' %}
-
+{% block title %}Praktikums-Firmen-Verwaltung{% endblock %}
 {% block header %}
-Praktikums-Firmen-Verwaltung
+Firmensuche
 {% endblock %}
 {% block body %}
 <div class="row">
@@ -14,40 +14,79 @@ Praktikums-Firmen-Verwaltung
     </div>
 </div>
 <div id="results">
-    {% if firmen is defined %}
+{% if firmen is defined %}
+<table class="table">
+    <thead>
+        <tr>
+            <th  width="40%">
+            Adresse    
+            </th>
+            <th  width="20%">
+            Ansprechpartner
+            </th>
+            <th  width="40%">
+            Informationen
+            </th>
+        </tr>
+    </thead>
+    <tbody>
     {% for firma in firmen %}
-    <div class="row">
-        <div class="col-md-4">
+    <tr>
+        <td>
             <a href="http://{{ firma.website | raw}}">{{ firma.website }}</a>
             <address>
+            {% if is_granted('ROLE_STAFF') %}
             <strong>
                 <a href="{{ path('editfirma', {'id': firma.id}) }}">{{ firma.name }}</a>
             </strong><br>
-            {{ firma.street }}<br>
-            {{ firma.postcode }} {{ firma.city }}
-            </address>
-        </div>
-        <div class="col-md-4"><em>Kurzbeschreibung:</em><br>{{ firma.description }}
-        </div>
-        <div class="col-md-4"><em>Ansprechpartner:</em><br>
-            <ul>
-            {% if firma.ansprechpartner is defined %}
-                {% for person in firma.ansprechpartner %}
-                    <li>{{ person.prename }} {{ person.surname }}</li>
-                {% endfor %}
+            {% else %}
+            <strong>
+                {{ firma.name }}
+            </strong><br>
             {% endif %}
+            {{ firma.street }}<br>
+            {{ firma.postcode }} {{ firma.city }}<br>
+            {{ firma.description }}
+            </address>
+        </td>
+        <td>
             <ul>
-        </div>
-    </div>
-{% endfor %}
-    {% endif %}
+            {% for person in firma.ansprechpartner %}
+                {% if is_granted('ROLE_STAFF') %}
+                    <li><a href="{{ path('editcontact', {'id': person.id }) }}">{{ person.prename }} {{ person.surname }}</a></li>
+                {% else %}
+                    <li><strong>{{ person.prename }} {{ person.surname }}</strong><br>
+                {% endif %}
+                    {{ person.position }}<br>
+                {% if person.phone is not empty %}
+                    Tel. {{ person.phone }}<br>
+                {% endif %}
+                    {{ person.email }}</li>
+            {% endfor %}
+            {% if is_granted('ROLE_USER') %}
+            <li><a href="{{ path('formcontact', {'id': firma.id}) }}">Neu Hinzufügen</a></li>
+            {% endif %}
+            </ul>
+        </td>
+        <td>
+            <ul>
+            {% for information in firma.information %}
+                {% if is_granted('ROLE_STAFF') %}
+                    <li><a href="{{ path('editinformation', {'id': information.id }) }}">{{ information.title }}</a> vom {{ information.datum|date('d.m.Y') }}</li>
+                {% else %}
+                    <li><strong>{{ information.title }}</strong> vom {{ information.datum|date('d.m.Y') }}<br>
+                {% endif %}
+                {{ information.content }}</li>
+            {% endfor %}
+            {% if is_granted('ROLE_USER') %}
+            <li><a href="{{ path('forminformation', {'id': firma.id}) }}">Neu Hinzufügen</a></li>
+            {% endif %}
+            </ul>
+        </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endif %}
 </div>
-{% endblock %}
-
-{% block javascripts %}
-{{ parent() }}
-    {% javascripts '@AppBundle/Resources/public/js/*'
-                    '@AppBundle/Resources/public/js/searchtool.js' %}
-        <script type="text/javascript" src="{{ asset_url }}"></script>
-    {% endjavascripts %}
 {% endblock %}
